@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Forecasting</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url("{{ url_for('static', filename='images/image.png') }}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 500px;
+            background: rgba(245, 241, 241, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background-color: #ff9800;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #e68900;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2> <img src="{{ url_for('static', filename='images/shyamlogo.png') }}" alt="Shyam Logo" width="90">
+        Production Forecasting
+        </h2>
+        <p>Enter the production value to predict consumption & byproduct.</p>
+        <input type="number" id="production" class="form-control" placeholder="Enter production value">
+        <button class="btn btn-primary mt-3" onclick="predict()">🔍 Predict</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function predict() {
+            let production = document.getElementById("production").value;
+            if (production === "") {
+                alert("Please enter a production value!");
+                return;
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ production: production })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+                } else {
+                    document.getElementById("result").innerHTML = `
+                        <p>📈 Predicted Consumption: <b>${data.consumption}</b></p>
+                        <p>📈 Predicted Byproduct: <b>${data.byproduct}</b></p>
+                    `;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
